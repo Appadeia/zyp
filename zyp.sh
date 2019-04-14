@@ -311,6 +311,9 @@ printf '%s\n' "
       orphaned, or         Lists installed packages which no longer have a repository associated with them.
                            '--list or -l' may be used to list only the package names.
                            '--remove or -r' may be used to remove all orphaned packages (USE WITH CAUTION).
+      unneeded, un         Lists installed packages which may no longer be needed.
+                           '--list' or '-l' may be used to list only the package names.
+                           '--remove' or '-r' may be used to remove all unneeded packages (USE WITH CAUTION).
 "
 }
 
@@ -524,6 +527,26 @@ case "$1" in
                 ;;
         esac
         ;;
+    un|unneeded)
+        case "$2" in
+            # list orphaned packages separated by spaces
+            -l|--list) zypper --no-color --no-refresh -q pa --unneeded | tail -n +3 | cut -f3 -d'|' | tr -d ' ' | tr '\n' ' '; echo;;
+            # prompt to remove all orphaned packages
+            -r|--remove) sudo zypper --no-refresh rm -u $(zypper --no-color --no-refresh -q pa --unneeded | tail -n +3 | cut -f3 -d'|' | tr -d ' ' | tr '\n' ' ');;
+            # list orphaned packages in similar fashion to search output
+            *)
+                zypper --no-color --no-refresh -q pa --unneeded | tail -n +3 > "$HOME"/.cache/zyp/zypunneeded.txt
+                for package in $(cat "$HOME"/.cache/zyp/zypunneeded.txt | cut -f3 -d'|' | tr -d ' '); do
+                    echo "$(tput setaf $COLOR_INFO)Name:    $(cat "$HOME"/.cache/zyp/zypunneeded.txt | grep -w "$package" | cut -f3 -d'|' | tr -d ' ')$(tput sgr0)"
+                    echo "Status:  $(cat "$HOME"/.cache/zyp/zypunneeded.txt | grep -w "$package" | cut -f1 -d'|' | tr -d ' ')"
+                    echo "Version: $(cat "$HOME"/.cache/zyp/zypunneeded.txt | grep -w "$package" | cut -f4 -d'|' | tr -d ' ')"
+                    echo "Arch:    $(cat "$HOME"/.cache/zyp/zypunneeded.txt | grep -w "$package" | cut -f5 -d'|' | tr -d ' ')"
+                    echo "Repo:    $(cat "$HOME"/.cache/zyp/zypunneeded.txt | grep -w "$package" | cut -f2 -d'|' | tr -d ' ')"
+                done
+                rm -f "$HOME"/.cache/zyp/zypunneeded.txt
+                ;;
+        esac
+        ;;
     # --no-refresh to save time
     pa|packages) zypper --no-refresh "$@";;
     # use rpm to get changelog for installed packages
@@ -571,4 +594,3 @@ case "$1" in
         esac
         ;;
 esac
-
