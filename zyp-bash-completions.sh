@@ -43,7 +43,7 @@ _available_packages() {
 	_available_solvables2 $cur
 }
 
-_zypper() {
+_zyp() {
 	ZYPPER="$(type -P zypper)"
 
 	local noglob=$(shopt -po noglob)
@@ -179,4 +179,4 @@ _zypper() {
 	eval $noglob
 }
 
-complete -F _zypper -o default zypper
+complete -F _zyp -o default zyp
