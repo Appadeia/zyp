@@ -164,10 +164,10 @@ _zyp() {
 			patch-info )
 				opts=(${opts[@]}$(echo; _available_solvables patch ))
 			;;
-			remove | rm | update | up)
+			remove | rm | update | up | ch | changes | lf | list-files )
 				opts=(${opts[@]}$(echo; _installed_packages ))
 			;;
-			install | in | source-install | si | download | info | if | addlock | al)
+			install | lin | local-install | in | source-install | si | download | info | if | addlock | al)
 				opts=(${opts[@]}$(echo; _available_packages ))
 			;;
 		esac
